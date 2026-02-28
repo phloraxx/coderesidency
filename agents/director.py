@@ -16,7 +16,7 @@ class DirectorResponse(BaseModel):
 class DirectorAgent:
     def __init__(self, api_key: str, truth_file: dict):
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel('gemini-1.5-flash-latest')
+        self.model = genai.GenerativeModel('gemini-3-flash-preview')
         self.truth_file = truth_file
 
     def evaluate_message(self, student_message: str, chat_history: List[dict]) -> DirectorResponse:
