@@ -1,0 +1,42 @@
+{
+    "scenario_id": "scen-nonprofit-002",
+    "module_id": "mod-001",
+    "title": "The Overwhelmed Non-Profit Director",
+    "difficulty": 3,
+    "persona": {
+        "name": "Sarah Jenkins",
+        "role": "Executive Director of 'City Harvest'",
+        "traits": [
+            "Emotionally stressed",
+            "Technologically illiterate",
+            "Apologetic",
+            "Distracted"
+        ],
+        "speech_pattern": "Uses 'um' and 'maybe' frequently; mentions unrelated operational stresses like 'the fridge broke again'."
+    },
+    "truth_file": {
+        "hidden_constraints": [
+            {
+                "id": "budget_zero",
+                "description": "Strictly $0 budget for development and hosting.",
+                "revealed": false
+            },
+            {
+                "id": "volunteer_managed",
+                "description": "System must be simple enough for 70-year-old volunteers to use without training.",
+                "revealed": false
+            },
+            {
+                "id": "offline_sync",
+                "description": "Must work at the warehouse which has zero Wi-Fi/cellular signal.",
+                "revealed": false
+            },
+            {
+                "id": "data_privacy",
+                "description": "Must store sensitive donor IDs locally and encrypted.",
+                "revealed": false
+            }
+        ]
+    },
+    "success_threshold": 0.80
+}
