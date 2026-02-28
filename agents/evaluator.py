@@ -15,7 +15,7 @@ class Assessment(BaseModel):
 class EvaluatorAgent:
     def __init__(self, api_key: str):
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel('gemini-1.5-flash-latest')
+        self.model = genai.GenerativeModel('gemini-3-flash-preview')
 
     def grade_session(self, chat_history: List[dict], truth_file: dict) -> Assessment:
         prompt = f"""

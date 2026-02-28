@@ -10,7 +10,7 @@ class ActorAgent:
         from your scenario JSON files.
         """
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel('gemini-1.5-flash-latest')
+        self.model = genai.GenerativeModel('gemini-3-flash-preview')
         self.persona = persona_data
 
     def generate_response(self, director_instruction: str, chat_history: List[dict]) -> str:
@@ -45,4 +45,4 @@ class ActorAgent:
         full_prompt = f"{system_prompt}\n\nDirector's Instruction: {director_instruction}"
         
         response = self.model.generate_content(full_prompt)
-        return response.texts
+        return response.text
