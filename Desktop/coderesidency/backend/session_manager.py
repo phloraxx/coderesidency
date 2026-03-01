@@ -61,7 +61,7 @@ def main():
     evaluator = EvaluatorAgent(API_KEY)
 
     chat_history = []
-    print(f"\n--- STARTING SIMULATION: {scenario_data.get('name', 'Unknown')} ---")
+    print(f"\n--- STARTING SIMULATION: {scenario_data.get('title', 'Unknown')} ---")
     
     # Use initial_message from JSON
     initial_msg = scenario_data.get('initial_message', 'Hello, how can I help you?')
