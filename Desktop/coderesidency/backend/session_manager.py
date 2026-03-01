@@ -57,10 +57,12 @@ def main():
     else:
         truth_content = {}
 
+
     # 2. Initialize Agents
-    director = DirectorAgent(API_KEY)
-    actor = ActorAgent(API_KEY)
-    evaluator = EvaluatorAgent(API_KEY)
+    # Add 'truth_content' as a second argument to these agents
+    director = DirectorAgent(API_KEY, truth_content) 
+    actor = ActorAgent(API_KEY) # Actor usually stays "in the dark"
+    evaluator = EvaluatorAgent(API_KEY, truth_content)
 
     chat_history = []
     print(f"\n--- STARTING SIMULATION: {scenario_data.get('name', 'Unknown')} ---")
