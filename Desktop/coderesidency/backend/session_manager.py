@@ -58,7 +58,7 @@ def main():
     # FIXED: Added required arguments to match the Agent classes
     director = DirectorAgent(API_KEY, truth_content) 
     actor = ActorAgent(API_KEY, scenario_data) # <--- Passed scenario_data here
-    evaluator = EvaluatorAgent(API_KEY, truth_content)
+    evaluator = EvaluatorAgent(API_KEY)
 
     chat_history = []
     print(f"\n--- STARTING SIMULATION: {scenario_data.get('name', 'Unknown')} ---")
