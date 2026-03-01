@@ -19,7 +19,7 @@ class ActorAgent:
         """
         
         system_prompt = f"""
-        ACT AS: {self.persona['name']}
+        ACT AS: {self.persona.get('name', 'Scenario Character')}
         YOUR ROLE: {self.persona.get('role', 'A client')}
         PERSONALITY: {', '.join(self.persona['traits'])}
         SPEECH STYLE: {self.persona['speech_pattern']}
