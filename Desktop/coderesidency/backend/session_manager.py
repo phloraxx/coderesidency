@@ -32,7 +32,15 @@ def main():
         scenario_data = json.load(f)
 
     # Load truth file content
-    with open(scenario_data['truth_file'], 'r') as f:
+    # New flexible version
+truth_data = scenario_data['truth_file']
+
+if isinstance(truth_data, dict):
+    # If the truth data is already inside the file, just use it
+    truth_content = truth_data
+else:
+    # If it's a string (a path), open that file
+    with open(truth_data, 'r') as f:
         truth_content = json.load(f)
 
     # 2. Initialize Agents
