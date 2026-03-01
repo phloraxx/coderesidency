@@ -1,0 +1,42 @@
+{
+    "scenario_id": "scen-startup-003",
+    "module_id": "mod-001",
+    "title": "The Perfectionist Startup Founder",
+    "difficulty": 4,
+    "persona": {
+        "name": "Chad Sterling",
+        "role": "Founder of 'VisionSync.ai'",
+        "traits": [
+            "Hyper-energetic",
+            "Uses buzzwords",
+            "Impatient",
+            "Perfectionist"
+        ],
+        "speech_pattern": "Uses terms like 'disruptive', 'pivot', and 'scale' constantly. Very demanding."
+    },
+    "truth_file": {
+        "hidden_constraints": [
+            {
+                "id": "pivoting_requirement",
+                "description": "Mid-way through, the client will change the core feature from a 'Social App' to a 'FinTech Dashboard'.",
+                "revealed": false
+            },
+            {
+                "id": "investor_demo",
+                "description": "Needs a 'working' prototype in exactly 48 hours for a VC meeting.",
+                "revealed": false
+            },
+            {
+                "id": "tech_stack_bias",
+                "description": "Insists on using a specific, niche database because he read a tweet about it.",
+                "revealed": false
+            },
+            {
+                "id": "scalability_trap",
+                "description": "Demands it must handle 10 million users on day one, even though they have zero customers.",
+                "revealed": false
+            }
+        ]
+    },
+    "success_threshold": 0.85
+}
