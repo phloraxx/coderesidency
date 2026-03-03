@@ -1,0 +1,102 @@
+import os
+import json
+from agents.director import DirectorAgent
+from agents.actor import ActorAgent
+from agents.evaluator import EvaluatorAgent
+
+def select_scenario():
+    scenario_dir = 'scenarios'
+    if not os.path.exists(scenario_dir):
+        print(f"Error: Folder '{scenario_dir}' not found!")
+        exit()
+        
+    files = [f for f in os.listdir(scenario_dir) if f.endswith('.json')]
+    
+    if not files:
+        print("No scenarios found in /scenarios folder!")
+        exit()
+
+    print("\n--- SELECT A SCENARIO ---")
+    for i, file in enumerate(files):
+        print(f"{i + 1}. {file.replace('.json', '')}")
+    
+    try:
+        choice = int(input("\nEnter the number of the scenario you want to run: ")) - 1
+        if choice < 0 or choice >= len(files):
+            raise IndexError
+        return os.path.join(scenario_dir, files[choice])
+    except (ValueError, IndexError):
+        print("Invalid choice. Defaulting to the first scenario.")
+        return os.path.join(scenario_dir, files[0])
+
+def main():
+    # 1. Setup
+    API_KEY = "AIzaSyAjU4otIN2s_2797Fb978j5gNc8C9SSt-E" 
+    
+    scenario_path = select_scenario()
+    
+    with open(scenario_path, 'r') as f:
+        scenario_data = json.load(f)
+
+    # Truth loading logic
+    truth_data = scenario_data.get('truth_file')
+
+    if isinstance(truth_data, dict):
+        truth_content = truth_data
+    elif isinstance(truth_data, str):
+        try:
+            # If truth_file is a path, we load that file
+            with open(truth_data, 'r') as f:
+                truth_content = json.load(f)
+        except FileNotFoundError:
+            print(f"Warning: Truth file {truth_data} not found.")
+            truth_content = {}
+    else:
+        truth_content = {}
+
+    # 2. Initialize Agents
+    # FIXED: Added required arguments to match the Agent classes
+    director = DirectorAgent(API_KEY, truth_content) 
+    actor = ActorAgent(API_KEY, scenario_data) # <--- Passed scenario_data here
+    evaluator = EvaluatorAgent(API_KEY)
+
+    chat_history = []
+    print(f"\n--- STARTING SIMULATION: {scenario_data.get('title', 'Unknown')} ---")
+    
+    # Use initial_message from JSON
+    initial_msg = scenario_data.get('initial_message', 'Hello, how can I help you?')
+    print(f"Client: {initial_msg}")
+    
+    # Store initial message in history so agents have context
+    chat_history.append({"role": "assistant", "content": initial_msg})
+
+    # 3. Chat Loop
+    for _ in range(6): 
+        user_input = input("\nYou (Student): ")
+        if user_input.lower() in ['exit', 'quit', 'done']:
+            break
+
+        # Director evaluates your message
+        evaluation = director.evaluate_message(user_input, chat_history)
+        
+        # Actor responds based on Director's secret instruction
+        actor_reply = actor.generate_response(
+            director_instruction=evaluation.reveal_instruction,
+            chat_history=chat_history
+        )
+        
+        print(f"\nClient: {actor_reply}")
+        chat_history.append({"role": "user", "content": user_input})
+        chat_history.append({"role": "assistant", "content": actor_reply})
+
+    # 4. Final Grading
+    print("\n--- GENERATING FINAL EVALUATION ---")
+    try:
+        report = evaluator.grade_session(chat_history, truth_content)
+        print(f"\nGRADE: {report.letter_grade} ({report.total_score}/100)")
+        print(f"FEEDBACK: {report.feedback}")
+    except Exception as e:
+        print(f"Grading failed: {e}")
+
+if __name__ == "__main__":
+    main()
