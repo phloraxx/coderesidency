@@ -1,0 +1,52 @@
+services:
+  # ─────────────────────────────────────────────
+  # FRONTEND — Next.js 14
+  # ─────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NEXT_PUBLIC_APPWRITE_ENDPOINT=${NEXT_PUBLIC_APPWRITE_ENDPOINT}
+      - NEXT_PUBLIC_APPWRITE_PROJECT_ID=${NEXT_PUBLIC_APPWRITE_PROJECT_ID}
+      - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
+      - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
+    depends_on:
+      - backend
+
+  # ─────────────────────────────────────────────
+  # BACKEND — FastAPI
+  # ─────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - /var/run/docker.sock:/var/run/docker.sock  # Docker-in-Docker for sandbox
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - APPWRITE_ENDPOINT=${APPWRITE_ENDPOINT}
+      - APPWRITE_PROJECT_ID=${APPWRITE_PROJECT_ID}
+      - APPWRITE_API_KEY=${APPWRITE_API_KEY}
+      - APPWRITE_DB_ID=${APPWRITE_DB_ID}
+      - APPWRITE_COLLECTION_USERS=${APPWRITE_COLLECTION_USERS}
+      - APPWRITE_COLLECTION_MODULES=${APPWRITE_COLLECTION_MODULES}
+      - APPWRITE_COLLECTION_SCENARIOS=${APPWRITE_COLLECTION_SCENARIOS}
+      - APPWRITE_COLLECTION_SESSIONS=${APPWRITE_COLLECTION_SESSIONS}
+      - APPWRITE_COLLECTION_CHAT_LOGS=${APPWRITE_COLLECTION_CHAT_LOGS}
+      - APPWRITE_COLLECTION_CODE_SUBMISSIONS=${APPWRITE_COLLECTION_CODE_SUBMISSIONS}
+      - APPWRITE_COLLECTION_TERMINAL_LOGS=${APPWRITE_COLLECTION_TERMINAL_LOGS}
+      - APPWRITE_COLLECTION_EVAL_REPORTS=${APPWRITE_COLLECTION_EVAL_REPORTS}
+      - APPWRITE_COLLECTION_ACHIEVEMENTS=${APPWRITE_COLLECTION_ACHIEVEMENTS}
+      - REDIS_URL=${REDIS_URL}
+      - BACKEND_SECRET_KEY=${BACKEND_SECRET_KEY}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
