@@ -1,0 +1,159 @@
+# CodeResidency — Implementation Walkthrough
+
+## What Was Built
+
+A complete full-stack monorepo for the **CodeResidency** platform — an AI-driven simulation environment for software engineering students. The project goes from zero (only [readme.md](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/readme.md) existed) to a fully-functional Phase 1 codebase.
+
+## Project Structure
+
+```
+codeResidency/
+├── .env.example                ← All config variables
+├── docker-compose.yml          ← Full dev stack orchestration
+├── Makefile                    ← Dev workflow shortcuts
+├── frontend/                   ← Next.js 14 + TypeScript app
+└── backend/                    ← FastAPI + Python app
+```
+
+## Backend (FastAPI)
+
+```
+backend/app/
+├── main.py                     ← FastAPI entry + CORS
+├── config.py                   ← Pydantic settings from env
+├── database/appwrite_client.py ← Appwrite SDK singleton
+├── agents/dual_agent.py        ← Director + Actor + Evaluator AI agents
+├── docker_manager/sandbox.py   ← Isolated code execution
+├── scoring/engine.py           ← All 4 module scoring formulas
+├── models/                     ← Pydantic schemas
+│   ├── user.py
+│   ├── session.py
+│   └── chat.py
+└── routers/
+    ├── auth.py       ← Appwrite JWT validation
+    ├── users.py      ← Profile, stats, leaderboard
+    ├── modules.py    ← Module + scenario listing
+    ├── chat.py       ← Dual-Agent pipeline (REST + WebSocket)
+    ├── scenarios.py  ← Session start + Docker code execution
+    └── eval.py       ← AI report card generation
+```
+
+### Key Backend Features
+
+| Feature | Implementation |
+|---------|---------------|
+| **Auth** | Appwrite JWT validated server-side on every request |
+| **Dual-Agent AI** | [DirectorAgent](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/app/agents/dual_agent.py#28-122) (Gemini Pro) evaluates quality → instructs [ActorAgent](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/app/agents/dual_agent.py#124-178) (Gemini Flash) |
+| **WebSocket Chat** | `/ws/chat` — auth handshake then bidirectional streaming |
+| **Docker Sandbox** | 256MB RAM, no network, ro-fs, 30s timeout, non-root user |
+| **Scoring** | Per-module formulas matching the spec exactly |
+| **DB Setup** | [scripts/setup_db.py](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/scripts/setup_db.py) creates all 9 Appwrite collections + seeds 4 modules + 2 scenarios |
+
+## Frontend (Next.js 14)
+
+```
+frontend/app/
+├── page.tsx                            ← Landing page
+├── login/page.tsx                      ← GitHub / Google OAuth
+├── dashboard/page.tsx                  ← Module grid + user stats
+├── modules/
+│   ├── difficult-client/[[...sessionId]]/page.tsx  ← Chat + Monaco editor
+│   ├── war-room/page.tsx              ← Stub (Phase 2)
+│   ├── gatekeeper/page.tsx            ← Stub (Phase 2)
+│   └── imposter/page.tsx              ← Stub (Phase 2)
+├── evaluation/[sessionId]/page.tsx    ← AI report cards
+└── leaderboard/page.tsx               ← Global rankings
+```
+
+### Key Frontend Features
+
+| Feature | Implementation |
+|---------|---------------|
+| **Auth** | Zustand store + Appwrite SDK + GitHub/Google OAuthProvider |
+| **Route Guards** | [AuthProvider.tsx](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/frontend/components/AuthProvider.tsx) redirects unauthenticated users |
+| **Design System** | Premium dark theme, CSS variables, Inter + JetBrains Mono fonts |
+| **Difficult Client** | Split-screen: chat panel + Monaco editor, phase transition at 80% constraints |
+| **Evaluation** | Animated score bars, letter grade ring, AI-generated breakdown |
+| **API Client** | [lib/api.ts](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/frontend/lib/api.ts) — auto-attaches fresh Appwrite JWT on every request |
+
+## The Difficult Client — Full Flow
+
+```
+Student logs in → Dashboard → Select "Angry Bakery Owner" scenario
+    ↓
+POST /api/scenarios/{id}/start → Session created, AI greeting
+    ↓
+Student types message → POST /api/chat/send
+    ↓
+    ┌─ DirectorAgent (Gemini Pro) evaluates:
+    │   • Communication quality (0-10)
+    │   • Which constraint to reveal
+    │   • How much to reveal (none/partial/full)
+    │   • actor_instruction
+    └─ ActorAgent (Gemini Flash) generates in-character response
+    ↓
+Constraint discovered → progress bar updates → score increments
+    ↓
+80%+ constraints → Monaco editor unlocks (code phase)
+    ↓
+Student writes code → /api/execute → Docker sandbox → output shown
+    ↓
+Click "Submit" → EvaluatorAgent (Gemini Pro) generates report
+    ↓
+Redirect to /evaluation/{sessionId} → Animated report card
+    ↓
+Global score updated in Appwrite → Appears on leaderboard
+```
+
+## How to Run
+
+### 1. Setup
+```bash
+# Copy and fill in env variables
+cp .env.example .env
+
+# Add at minimum:
+# GEMINI_API_KEY=your_key_here
+```
+
+### 2. Start Appwrite (first time only)
+```bash
+docker compose up appwrite appwrite-mariadb appwrite-redis redis -d
+# Wait ~30s, then open http://localhost and create a project named "coderesidency"
+# Copy the Project ID and API Key to .env
+```
+
+### 3. Seed the Database
+```bash
+cd backend
+pip install poetry
+poetry install
+poetry run python scripts/setup_db.py
+```
+
+### 4. Start Everything
+```bash
+make dev
+# OR
+docker compose up
+```
+
+### 5. Open
+- Frontend: `http://localhost:3000`
+- Backend API docs: `http://localhost:8000/docs`
+- Appwrite Console: `http://localhost`
+
+## What's Remaining (Phase 2)
+
+| Module | Status |
+|--------|--------|
+| War Room (xterm.js terminal + fault injection) | Stub page — backend Docker manager skeleton exists |
+| Gatekeeper (resume upload + interview) | Stub page |
+| Imposter (Git forensics terminal) | Stub page |
+| Appwrite OAuth provider config | Manual step in Appwrite console |
+
+## Files Created
+
+**Root:** [.env.example](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/.env.example), [docker-compose.yml](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/docker-compose.yml), [Makefile](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/Makefile)  
+**Backend:** [pyproject.toml](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/pyproject.toml), [Dockerfile](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/Dockerfile), [main.py](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/app/main.py), [config.py](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/app/config.py), [appwrite_client.py](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/app/database/appwrite_client.py), [dual_agent.py](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/app/agents/dual_agent.py), [sandbox.py](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/app/docker_manager/sandbox.py), [engine.py](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/app/scoring/engine.py), [user.py](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/app/models/user.py), [session.py](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/app/models/session.py), [chat.py](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/app/models/chat.py), [auth.py](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/app/routers/auth.py), [users.py](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/app/routers/users.py), [modules.py](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/app/routers/modules.py), [chat.py](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/app/models/chat.py), [scenarios.py](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/app/routers/scenarios.py), [eval.py](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/app/routers/eval.py), [scripts/setup_db.py](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/scripts/setup_db.py)  
+**Frontend:** [next.config.ts](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/frontend/next.config.ts), [Dockerfile](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/Dockerfile), [globals.css](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/frontend/app/globals.css), [layout.tsx](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/frontend/app/layout.tsx), [page.tsx](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/frontend/app/page.tsx) (landing), [login/](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/frontend/lib/appwrite.ts#14-22), `dashboard/`, `modules/difficult-client/`, `modules/war-room/`, `modules/gatekeeper/`, `modules/imposter/`, [evaluation/](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/app/routers/eval.py#144-165), [leaderboard/](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/backend/app/routers/users.py#96-112), [lib/appwrite.ts](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/frontend/lib/appwrite.ts), [lib/api.ts](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/frontend/lib/api.ts), [store/authStore.ts](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/frontend/store/authStore.ts), [components/AuthProvider.tsx](file:///c:/Users/drvij/Desktop/MuLearn%20Scet/codeResidency/frontend/components/AuthProvider.tsx)
