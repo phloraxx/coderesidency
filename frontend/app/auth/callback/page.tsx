@@ -17,20 +17,15 @@ import { useAuthStore } from '@/store/authStore';
 export default function AuthCallbackPage() {
     const router = useRouter();
     const params = useSearchParams();
+    const userId = params.get('userId');
+    const secret = params.get('secret');
     const { initialize } = useAuthStore();
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(
+        () => (!userId || !secret) ? 'Missing auth parameters. Please try logging in again.' : null
+    );
 
     useEffect(() => {
-        const userId = params.get('userId');
-        const secret = params.get('secret');
-
-        if (!userId || !secret) {
-            // Wait until after the initial render to set the error
-            const timer = setTimeout(() => {
-                setError('Missing auth parameters. Please try logging in again.');
-            }, 0);
-            return () => clearTimeout(timer);
-        }
+        if (!userId || !secret) return;
 
         createSessionFromToken(userId, secret)
             .then(async () => {
@@ -42,7 +37,7 @@ export default function AuthCallbackPage() {
                 console.error('Session creation failed:', err);
                 setError('Authentication failed. The link may have expired.');
             });
-    }, [params, router, initialize]);
+    }, [userId, secret, router, initialize]);
 
     if (error) {
         return (

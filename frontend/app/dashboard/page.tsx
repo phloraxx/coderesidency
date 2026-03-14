@@ -16,6 +16,13 @@ interface Module {
     icon?: string;
 }
 
+interface Stats {
+    global_score?: number;
+    sessions_total?: number;
+    modules_completed?: number;
+    average_score?: number;
+}
+
 const MODULE_ICONS: Record<string, string> = {
     'difficult-client': '💬',
     'war-room': '🔥',
@@ -39,7 +46,7 @@ export default function DashboardPage() {
     const router = useRouter();
     const { user, logout, initialize, initialized } = useAuthStore();
     const [modules, setModules] = useState<Module[]>([]);
-    const [stats, setStats] = useState<Record<string, any> | null>(null);
+    const [stats, setStats] = useState<Stats | null>(null);
     const [loading, setLoading] = useState(true);
 
     // Run auth check once on mount
