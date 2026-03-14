@@ -42,7 +42,6 @@ const GRADE_COLORS: Record<string, string> = {
 
 export default function EvaluationPage() {
     const params = useParams();
-    const router = useRouter();
     const sessionId = params?.sessionId as string;
     const [report, setReport] = useState<Report | null>(null);
     const [loading, setLoading] = useState(true);
@@ -161,7 +160,7 @@ export default function EvaluationPage() {
                     <Link href="/modules/difficult-client" className="btn btn-ghost">
                         Try Another Scenario
                     </Link>
-                    <Link href="/dashboard" className="btn btn-primary">
+                    <Link href="/dashboard" className="btn btn-solid">
                         Back to Dashboard →
                     </Link>
                 </div>
