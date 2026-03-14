@@ -82,7 +82,7 @@ export default function LeaderboardPage() {
                             <div className="card" style={{ textAlign: 'center', padding: 48 }}>
                                 <div style={{ fontSize: '2rem', marginBottom: 8 }}>🏜️</div>
                                 <p style={{ color: 'var(--text-muted)' }}>No scores yet. Be the first!</p>
-                                <Link href="/dashboard" className="btn btn-primary" style={{ marginTop: 20, display: 'inline-flex' }}>
+                                <Link href="/dashboard" className="btn btn-solid" style={{ marginTop: 20, display: 'inline-flex' }}>
                                     Start Training →
                                 </Link>
                             </div>

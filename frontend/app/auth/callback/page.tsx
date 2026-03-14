@@ -25,8 +25,11 @@ export default function AuthCallbackPage() {
         const secret = params.get('secret');
 
         if (!userId || !secret) {
-            setError('Missing auth parameters. Please try logging in again.');
-            return;
+            // Wait until after the initial render to set the error
+            const timer = setTimeout(() => {
+                setError('Missing auth parameters. Please try logging in again.');
+            }, 0);
+            return () => clearTimeout(timer);
         }
 
         createSessionFromToken(userId, secret)
@@ -52,7 +55,7 @@ export default function AuthCallbackPage() {
                 <p style={{ color: '#f87171', fontSize: '1rem' }}>{error}</p>
                 <button
                     onClick={() => router.replace('/login')}
-                    className="btn btn-primary"
+                    className="btn btn-solid"
                     style={{ marginTop: 8 }}
                 >
                     Back to Login
