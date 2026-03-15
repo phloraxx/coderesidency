@@ -65,15 +65,14 @@ export default function LandingPage() {
       </nav>
 
       {/* ── HERO ─────────────────────────── */}
-      <section style={{
+      <section className="bg-animated-gradient" style={{
         minHeight: '100vh',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         textAlign: 'center', padding: '160px 24px 80px',
         position: 'relative', overflow: 'hidden',
-        background: 'radial-gradient(circle at center, #f8f9fa 0%, #ffffff 100%)',
       }}>
         <div style={{ position: 'relative', maxWidth: 1100 }}>
-          <div className="badge animate-fade-up" style={{ marginBottom: 40 }}>
+          <div className="badge animate-fade-up animate-float" style={{ marginBottom: 40 }}>
             Clinical Rotation for Software Engineers
           </div>
 
@@ -200,9 +199,8 @@ export default function LandingPage() {
       </section>
 
       {/* ── CTA ──────────────────────────── */}
-      <section style={{
+      <section className="bg-animated-gradient" style={{
         padding: '100px 24px', textAlign: 'center',
-        background: '#f8f9fa',
         position: 'relative',
         overflow: 'hidden'
       }}>
