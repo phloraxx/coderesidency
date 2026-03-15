@@ -58,10 +58,13 @@ export default function DifficultClientPage() {
         setActiveSessionId(sessionId);
         getChatHistory(sessionId).then((d) => {
             const docs = d.documents || [];
-            setMessages(docs.map((doc: any) => ({
-                sender: doc.sender,
-                message: doc.message,
-                timestamp: doc.$createdAt,
+            const VALID_SENDERS = ['user', 'actor_ai', 'system'] as const;
+            setMessages(docs.map((doc: Record<string, unknown>) => ({
+                sender: VALID_SENDERS.includes(doc.sender as Message['sender'])
+                    ? (doc.sender as Message['sender'])
+                    : 'system',
+                message: doc.message as string,
+                timestamp: doc.$createdAt as string,
             })));
         }).catch(console.error);
     }, [sessionId]);
@@ -119,7 +122,7 @@ export default function DifficultClientPage() {
         if (!activeSessionId) return;
         setEvaluating(true);
         try {
-            const report = await generateEvaluation(activeSessionId);
+            await generateEvaluation(activeSessionId);
             router.push(`/evaluation/${activeSessionId}`);
         } catch (e) {
             console.error(e);
@@ -147,7 +150,7 @@ export default function DifficultClientPage() {
                                 <div key={s.$id} className="card" style={{ cursor: 'pointer' }} onClick={() => handleStartScenario(s.$id)}>
                                     <h3 style={{ marginBottom: 8 }}>{s.title}</h3>
                                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: 20 }}>{s.description}</p>
-                                    <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
+                                    <button className="btn btn-solid" style={{ width: '100%', justifyContent: 'center' }}>
                                         Start Scenario →
                                     </button>
                                 </div>
@@ -200,7 +203,7 @@ export default function DifficultClientPage() {
                         <span style={{ fontWeight: 800, color: 'var(--accent-blue)', fontSize: '1.1rem' }}>{score}</span>
                     </div>
                     {phase === 'code' && (
-                        <button onClick={handleSubmit} disabled={evaluating} className="btn btn-primary" style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
+                        <button onClick={handleSubmit} disabled={evaluating} className="btn btn-solid" style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
                             {evaluating ? <><div className="spinner" style={{ width: 14, height: 14 }} /> Evaluating...</> : 'Submit & Get Report →'}
                         </button>
                     )}
@@ -274,7 +277,7 @@ export default function DifficultClientPage() {
                                 fontSize: '0.9rem', outline: 'none',
                             }}
                         />
-                        <button onClick={handleSend} disabled={sending || !input.trim()} className="btn btn-primary" style={{ padding: '10px 16px' }}>
+                        <button onClick={handleSend} disabled={sending || !input.trim()} className="btn btn-solid" style={{ padding: '10px 16px' }}>
                             {sending ? <div className="spinner" style={{ width: 16, height: 16 }} /> : '→'}
                         </button>
                     </div>

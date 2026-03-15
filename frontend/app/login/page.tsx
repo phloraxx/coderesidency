@@ -61,7 +61,7 @@ export default function LoginPage() {
 
                         <button
                             onClick={loginWithGoogle}
-                            className="btn btn-primary"
+                            className="btn btn-solid"
                             style={{ width: '100%', justifyContent: 'center', padding: '14px 20px', fontSize: '0.95rem' }}
                         >
                             <svg width="20" height="20" viewBox="0 0 24 24">
