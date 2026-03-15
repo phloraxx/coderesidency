@@ -58,8 +58,11 @@ export default function DifficultClientPage() {
         setActiveSessionId(sessionId);
         getChatHistory(sessionId).then((d) => {
             const docs = d.documents || [];
+            const VALID_SENDERS = ['user', 'actor_ai', 'system'] as const;
             setMessages(docs.map((doc: Record<string, unknown>) => ({
-                sender: doc.sender as string,
+                sender: VALID_SENDERS.includes(doc.sender as Message['sender'])
+                    ? (doc.sender as Message['sender'])
+                    : 'system',
                 message: doc.message as string,
                 timestamp: doc.$createdAt as string,
             })));
