@@ -3,12 +3,21 @@
 :root {
   --bg-primary: #fdfdfd;
   --bg-secondary: #f4f4f4;
+  --bg-elevated: #f9f9f9;
+  --bg-card: var(--bg-primary);
   --text-primary: #0a0a0a;
   --text-secondary: #525252;
   --text-muted: #a3a3a3;
   --border: #e5e5e5;
   --border-hover: #0a0a0a;
   --accent: #0a0a0a;
+
+  /* Accent palette — used by modules, evaluation, leaderboard */
+  --accent-blue: #6366f1;
+  --accent-green: #10b981;
+  --accent-orange: #f59e0b;
+  --accent-red: #ef4444;
+  --gradient-primary: linear-gradient(135deg, #6366f1, #8b5cf6);
 
   --radius-sm: 0px;
   --radius-md: 0px;
@@ -259,4 +268,34 @@ code, pre, .mono {
   font-family: 'JetBrains Mono', monospace;
   text-transform: uppercase;
   border: 1px dashed var(--border-hover);
+}
+
+/* ── Backward-compat animation aliases ── */
+/* Components reference animate-fade-in / stagger-children / pulse-glow from
+   the previous theme. Map them to the current animation primitives. */
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.3); }
+  50%       { box-shadow: 0 0 0 12px rgba(99, 102, 241, 0); }
+}
+
+.animate-fade-in {
+  animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+.stagger-children > * {
+  animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.10s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.20s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.30s; }
+
+/* ── Badge variants ─────────────────── */
+.badge-blue {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
 }

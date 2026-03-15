@@ -1,13 +1,9 @@
 'use client';
 
-import React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { loginWithGitHub, loginWithGoogle } from '@/lib/appwrite';
 
 export default function LandingPage() {
-  const router = useRouter();
-
   const modules = [
     {
       title: 'The Difficult Client',
@@ -158,15 +154,15 @@ export default function LandingPage() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 32 }}>
           {modules.map((m, i) => (
-            <div
+            <Link
               key={m.title}
+              href={m.link}
               className="card animate-fade-up"
               style={{
                 animationDelay: `${i * 0.1}s`,
-                cursor: 'pointer',
-                display: 'flex', flexDirection: 'column'
+                display: 'flex', flexDirection: 'column',
+                textDecoration: 'none', color: 'inherit',
               }}
-              onClick={() => router.push(m.link)}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 48 }}>
                 <span className="mono" style={{ fontSize: '2rem', color: 'var(--text-muted)', lineHeight: 1 }}>{m.icon}</span>
@@ -196,7 +192,7 @@ export default function LandingPage() {
                 </div>
                 <span className="mono" style={{ fontSize: '1.2rem', color: 'var(--text-primary)' }}>→</span>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
