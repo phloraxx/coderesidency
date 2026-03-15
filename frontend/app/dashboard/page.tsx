@@ -71,70 +71,68 @@ export default function DashboardPage() {
     }, [initialized, user, router]);
 
     return (
-        <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
+        <div style={{ minHeight: '100vh', background: 'var(--bg-secondary)' }}>
             {/* ── NAVBAR ───────────────────────── */}
             <nav style={{
                 position: 'sticky', top: 0, zIndex: 50,
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 padding: '16px 32px',
-                background: 'rgba(10,10,15,0.9)',
+                background: 'rgba(255, 255, 255, 0.9)',
                 backdropFilter: 'blur(12px)',
                 borderBottom: '1px solid var(--border)',
+                boxShadow: '0 1px 2px 0 rgba(60,64,67,0.1)',
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: '1.4rem' }}>⚕️</span>
-                    <span style={{ fontWeight: 800, letterSpacing: '-0.03em', fontSize: '1.05rem' }}>
-                        Code<span style={{ color: 'var(--accent-blue)' }}>Residency</span>
+                    <span style={{ fontWeight: 700, letterSpacing: '-0.02em', fontSize: '1.2rem', color: 'var(--text-primary)' }}>
+                        Code<span style={{ color: 'var(--google-blue)' }}>Residency</span>
                     </span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <Link href="/leaderboard" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>
-                        🏆 Leaderboard
+                <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+                    <Link href="/leaderboard" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.95rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span>🏆</span> Leaderboard
                     </Link>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, borderLeft: '1px solid var(--border)', paddingLeft: 24 }}>
                         <div style={{
-                            width: 32, height: 32, borderRadius: '50%',
-                            background: 'var(--gradient-primary)',
+                            width: 36, height: 36, borderRadius: '50%',
+                            background: 'var(--google-blue)', color: 'white',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: '0.9rem', fontWeight: 700,
+                            fontSize: '1rem', fontWeight: 500,
                         }}>
-                            {user?.name?.charAt(0) || 'U'}
+                            {user?.name?.[0]?.toUpperCase() || 'U'}
                         </div>
-                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{user?.name}</span>
+                        <span style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: 500 }}>{user?.name}</span>
+                        <button onClick={logout} className="btn btn-ghost" style={{ padding: '8px 16px', fontSize: '0.9rem', marginLeft: 8 }}>
+                            Sign out
+                        </button>
                     </div>
-                    <button onClick={logout} className="btn btn-ghost" style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
-                        Sign out
-                    </button>
                 </div>
             </nav>
 
-            <div className="container" style={{ paddingTop: 48, paddingBottom: 80 }}>
+            <div className="container" style={{ paddingTop: 48, paddingBottom: 80, maxWidth: 1200 }}>
                 {/* ── WELCOME ──────────────────────── */}
                 <div className="animate-fade-in" style={{ marginBottom: 48 }}>
-                    <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', marginBottom: 8 }}>
+                    <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', marginBottom: 8, fontWeight: 700, letterSpacing: '-0.02em' }}>
                         Welcome back, {user?.name?.split(' ')[0] || 'Resident'} 👋
                     </h1>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '1rem' }}>
-                        Choose a module and start your next simulation.
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
+                        Resume your training or start a new simulation.
                     </p>
                 </div>
 
                 {/* ── STATS ────────────────────────── */}
                 {stats && (
                     <div style={{
-                        display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-                        gap: 16, marginBottom: 48,
+                        display: 'flex', flexWrap: 'wrap',
+                        gap: 24, marginBottom: 56,
                     }}>
                         {[
-                            { label: 'Global Score', val: stats.global_score ?? 0, icon: '⭐' },
-                            { label: 'Sessions', val: stats.sessions_total ?? 0, icon: '🎮' },
-                            { label: 'Completed', val: stats.modules_completed ?? 0, icon: '✅' },
-                            { label: 'Avg Score', val: `${stats.average_score ?? 0}%`, icon: '📊' },
+                            { label: 'Global Score', val: stats.global_score ?? 0, color: 'var(--google-blue)' },
+                            { label: 'Simulations', val: stats.sessions_total ?? 0, color: 'var(--text-primary)' },
+                            { label: 'Avg Score', val: stats.average_score?.toFixed(1) || '0.0', color: 'var(--text-primary)' },
                         ].map((s) => (
-                            <div key={s.label} className="card" style={{ textAlign: 'center', padding: 20 }}>
-                                <div style={{ fontSize: '1.6rem', marginBottom: 4 }}>{s.icon}</div>
-                                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--accent-blue)' }}>{s.val}</div>
-                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4 }}>{s.label}</div>
+                            <div key={s.label} className="card" style={{ flex: '1 1 200px', padding: '24px 32px' }}>
+                                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8, fontWeight: 500 }}>{s.label}</div>
+                                <div style={{ fontSize: '2.5rem', fontWeight: 700, color: s.color, lineHeight: 1 }}>{s.val}</div>
                             </div>
                         ))}
                     </div>
@@ -150,46 +148,64 @@ export default function DashboardPage() {
                         ))}
                     </div>
                 ) : (
-                    <div className="stagger-children" style={{
-                        display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 24,
-                    }}>
-                        {modules.map((mod) => {
-                            const color = MODULE_COLORS[mod.slug] || '#6366f1';
+                    <>
+                        <div style={{ marginBottom: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h2 style={{ fontSize: '1.5rem', fontWeight: 500 }}>Available Modules</h2>
+                        </div>
+
+                        <div className="stagger-children" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 24 }}>
+                            {modules.map((mod) => {
+                            const color = MODULE_COLORS[mod.slug] || 'var(--google-blue)';
                             const icon = MODULE_ICONS[mod.slug] || '📚';
                             const route = MODULE_ROUTES[mod.slug] || `/modules/${mod.slug}`;
                             return (
                                 <Link
                                     key={mod.$id}
                                     href={route}
-                                    style={{ textDecoration: 'none', display: 'block' }}
+                                    className="card link-hover-none"
+                                    style={{
+                                        display: 'flex', flexDirection: 'column',
+                                        borderTop: `4px solid ${color}`,
+                                        textDecoration: 'none',
+                                        color: 'inherit',
+                                        padding: '32px'
+                                    }}
                                 >
-                                    <div className="card" style={{
-                                        cursor: 'pointer',
-                                        borderTop: `2px solid ${color}`,
-                                        position: 'relative', overflow: 'hidden', height: '100%',
-                                    }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
                                         <div style={{
-                                            position: 'absolute', top: 0, left: 0, right: 0, height: 60,
-                                            background: `radial-gradient(ellipse at top, ${color}18, transparent)`,
-                                        }} />
-                                        <div style={{ fontSize: '2rem', marginBottom: 12 }}>{icon}</div>
-                                        <h3 style={{ fontSize: '1.1rem', marginBottom: 8 }}>{mod.title}</h3>
-                                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.6, marginBottom: 20 }}>
-                                            {mod.description}
-                                        </p>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <div style={{ display: 'flex', gap: 3 }}>
-                                                {Array.from({ length: 5 }).map((_, j) => (
-                                                    <div key={j} style={{
-                                                        width: 18, height: 4, borderRadius: 2,
-                                                        background: j < mod.difficulty_level ? color : 'var(--border)',
-                                                    }} />
-                                                ))}
-                                            </div>
-                                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                                                {mod.estimated_duration_mins}min
-                                            </span>
+                                            width: 56, height: 56, borderRadius: '50%',
+                                            background: `color-mix(in srgb, ${color} 10%, transparent)`,
+                                            color: color,
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            fontSize: '1.75rem'
+                                        }}>
+                                            {icon}
                                         </div>
+                                        <span className="badge" style={{ fontSize: '0.75rem', background: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}>
+                                            {mod.estimated_duration_mins} MINS
+                                        </span>
+                                    </div>
+
+                                    <h3 style={{ fontSize: '1.25rem', fontWeight: 500, marginBottom: 12 }}>{mod.title}</h3>
+                                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6, flexGrow: 1, marginBottom: 32 }}>
+                                        {mod.description}
+                                    </p>
+
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 20, borderTop: '1px solid var(--border)' }}>
+                                        <div style={{ display: 'flex', gap: 6 }}>
+                                            {Array.from({ length: 5 }).map((_, j) => (
+                                                <div
+                                                    key={j}
+                                                    style={{
+                                                        width: 8, height: 8, borderRadius: '50%',
+                                                        background: j < mod.difficulty_level ? color : 'var(--border)',
+                                                    }}
+                                                />
+                                            ))}
+                                        </div>
+                                        <span style={{ fontSize: '0.9rem', fontWeight: 500, color: color }}>
+                                            Start Module →
+                                        </span>
                                     </div>
                                 </Link>
                             );
@@ -207,7 +223,8 @@ export default function DashboardPage() {
                                 </code>
                             </div>
                         )}
-                    </div>
+                        </div>
+                    </>
                 )}
             </div>
         </div>

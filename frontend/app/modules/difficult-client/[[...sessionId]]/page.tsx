@@ -133,31 +133,36 @@ export default function DifficultClientPage() {
     // ── Scenario Selector ─────────────────────────────
     if (!sessionId) {
         return (
-            <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', padding: '24px' }}>
-                <div className="container" style={{ paddingTop: 48 }}>
-                    <Link href="/dashboard" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.85rem' }}>
-                        ← Back to Dashboard
+            <div style={{ minHeight: '100vh', background: 'var(--bg-secondary)', padding: '24px' }}>
+                <div className="container" style={{ paddingTop: 48, maxWidth: 1000 }}>
+                    <Link href="/dashboard" style={{ color: 'var(--google-blue)', textDecoration: 'none', fontSize: '0.95rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span>←</span> Back to Dashboard
                     </Link>
-                    <h1 style={{ marginTop: 24, marginBottom: 8, fontSize: '2rem' }}>💬 The Difficult Client</h1>
-                    <p style={{ color: 'var(--text-secondary)', marginBottom: 40 }}>
-                        Choose a scenario and practice extracting real requirements from a challenging client.
-                    </p>
+                    <div style={{ marginTop: 32, marginBottom: 48 }}>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 48, height: 48, borderRadius: '50%', background: 'color-mix(in srgb, var(--google-blue) 10%, transparent)', color: 'var(--google-blue)', fontSize: '1.5rem', marginBottom: 16 }}>💬</div>
+                        <h1 style={{ marginBottom: 12, fontSize: '2.5rem', fontWeight: 700, letterSpacing: '-0.02em' }}>The Difficult Client</h1>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', maxWidth: 600 }}>
+                            Choose a scenario and practice extracting real requirements from a challenging client.
+                        </p>
+                    </div>
                     {loadingScenarios ? (
-                        <div className="spinner" />
+                        <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}><div className="spinner" /></div>
                     ) : (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24 }}>
                             {scenarios.map((s) => (
-                                <div key={s.$id} className="card" style={{ cursor: 'pointer' }} onClick={() => handleStartScenario(s.$id)}>
-                                    <h3 style={{ marginBottom: 8 }}>{s.title}</h3>
-                                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: 20 }}>{s.description}</p>
-                                    <button className="btn btn-solid" style={{ width: '100%', justifyContent: 'center' }}>
-                                        Start Scenario →
-                                    </button>
+                                <div key={s.$id} className="card" style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column' }} onClick={() => handleStartScenario(s.$id)}>
+                                    <h3 style={{ marginBottom: 12, fontSize: '1.25rem', fontWeight: 500 }}>{s.title}</h3>
+                                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginBottom: 24, flexGrow: 1, lineHeight: 1.5 }}>{s.description}</p>
+                                    <div style={{ borderTop: '1px solid var(--border)', paddingTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Estimated: 15-30m</span>
+                                        <span style={{ color: 'var(--google-blue)', fontWeight: 500, fontSize: '0.9rem' }}>Start Scenario →</span>
+                                    </div>
                                 </div>
                             ))}
                             {scenarios.length === 0 && (
-                                <div className="card" style={{ gridColumn: '1/-1', textAlign: 'center', padding: 40 }}>
-                                    <p style={{ color: 'var(--text-muted)' }}>No scenarios found. Run <code>python scripts/setup_db.py</code></p>
+                                <div className="card" style={{ gridColumn: '1/-1', textAlign: 'center', padding: 48 }}>
+                                    <div style={{ fontSize: '2rem', marginBottom: 16 }}>⚠️</div>
+                                    <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>No scenarios found. Run the setup script first.</p>
                                 </div>
                             )}
                         </div>
@@ -173,39 +178,49 @@ export default function DifficultClientPage() {
             {/* Top Bar */}
             <div style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '12px 20px', background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)',
+                padding: '12px 24px', background: 'var(--bg-primary)', borderBottom: '1px solid var(--border)',
+                boxShadow: '0 1px 2px 0 rgba(60,64,67,0.1)',
                 flexShrink: 0,
+                zIndex: 10,
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <Link href="/modules/difficult-client" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.85rem' }}>←</Link>
-                    <span style={{ fontSize: '1.1rem' }}>💬</span>
-                    <span style={{ fontWeight: 700 }}>The Difficult Client</span>
-                    <div className="badge badge-blue">{phase === 'chat' ? 'Discovery Phase' : 'Coding Phase'}</div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-                    {/* Constraint progress */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <Link href="/modules/difficult-client" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '1.25rem', display: 'flex', alignItems: 'center' }}>
+                        ←
+                    </Link>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Constraints:</span>
-                        <div style={{ display: 'flex', gap: 3 }}>
+                        <span style={{ fontSize: '1.25rem' }}>💬</span>
+                        <span style={{ fontWeight: 500, fontSize: '1.1rem' }}>The Difficult Client</span>
+                    </div>
+                    <div className="badge badge-blue" style={{ marginLeft: 8 }}>{phase === 'chat' ? 'Discovery Phase' : 'Coding Phase'}</div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+                    {/* Constraint progress */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Constraints:</span>
+                        <div style={{ display: 'flex', gap: 4 }}>
                             {Array.from({ length: constraintsTotal || 4 }).map((_, i) => (
                                 <div key={i} style={{
-                                    width: 24, height: 6, borderRadius: 3,
-                                    background: i < constraintsDisc ? 'var(--accent-green)' : 'var(--border)',
+                                    width: 32, height: 6, borderRadius: 3,
+                                    background: i < constraintsDisc ? 'var(--google-green)' : 'var(--border)',
                                     transition: 'background 0.3s',
                                 }} />
                             ))}
                         </div>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{constraintsDisc}/{constraintsTotal || '?'}</span>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: 500 }}>{constraintsDisc}/{constraintsTotal || '?'}</span>
                     </div>
+                    <div style={{ width: 1, height: 24, background: 'var(--border)' }} />
                     {/* Score */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Score:</span>
-                        <span style={{ fontWeight: 800, color: 'var(--accent-blue)', fontSize: '1.1rem' }}>{score}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Score:</span>
+                        <span style={{ fontWeight: 700, color: 'var(--google-blue)', fontSize: '1.25rem', fontVariantNumeric: 'tabular-nums' }}>{score}</span>
                     </div>
                     {phase === 'code' && (
-                        <button onClick={handleSubmit} disabled={evaluating} className="btn btn-solid" style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
-                            {evaluating ? <><div className="spinner" style={{ width: 14, height: 14 }} /> Evaluating...</> : 'Submit & Get Report →'}
-                        </button>
+                        <>
+                            <div style={{ width: 1, height: 24, background: 'var(--border)' }} />
+                            <button onClick={handleSubmit} disabled={evaluating} className="btn btn-solid" style={{ padding: '8px 20px', fontSize: '0.9rem' }}>
+                                {evaluating ? <><div className="spinner" style={{ width: 14, height: 14 }} /> Evaluating...</> : 'Submit & Get Report →'}
+                            </button>
+                        </>
                     )}
                 </div>
             </div>
