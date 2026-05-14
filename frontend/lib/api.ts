@@ -70,4 +70,14 @@ export const generateEvaluation = (sessionId: string) =>
 export const getEvaluation = (sessionId: string) =>
     api.get(`/api/evaluation/${sessionId}`).then((r) => r.data);
 
+// ─── Code Crucible (Phase 2) ──────────────────────
+export const generateChallenge = (sessionId: string) =>
+    api.post(`/api/challenge/${sessionId}/generate`).then((r) => r.data);
+export const runChallengeCode = (sessionId: string, code: string, language: string) =>
+    api.post(`/api/challenge/${sessionId}/run`, { code, language }).then((r) => r.data);
+export const submitChallenge = (sessionId: string, code: string, language: string) =>
+    api.post(`/api/challenge/${sessionId}/submit`, { code, language }).then((r) => r.data);
+export const getChallenge = (sessionId: string) =>
+    api.get(`/api/challenge/${sessionId}`).then((r) => r.data);
+
 export default api;

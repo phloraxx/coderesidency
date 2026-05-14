@@ -119,6 +119,33 @@ def calculate_imposter_score(
     return max(0, min(int(total), 100))
 
 
+def calculate_code_crucible_score(
+    passed_cases: int,
+    total_cases: int,
+    code_quality_score: int,
+    time_used_seconds: int,
+    time_limit_seconds: int,
+) -> int:
+    """
+    Code Crucible scoring:
+    - Test Case Pass Rate: 50 pts
+    - Code Quality: 30 pts (from OutputValidatorAgent)
+    - Efficiency: 20 pts (time-based)
+    """
+    # Test Case Pass Rate: 50 pts
+    test_score = (passed_cases / max(total_cases, 1)) * 50
+
+    # Code Quality: 30 pts (straight from LLM, already capped at 30)
+    quality_score = min(code_quality_score, 30)
+
+    # Efficiency: 20 pts (time-based)
+    time_ratio = time_used_seconds / max(time_limit_seconds, 1)
+    efficiency_score = max(0, 20 - (time_ratio * 15))  # lose up to 15 pts for slowness
+
+    total = test_score + quality_score + efficiency_score
+    return min(int(total), 100)
+
+
 def score_to_grade(score: int) -> str:
     """Convert numeric score to letter grade."""
     if score >= 95:

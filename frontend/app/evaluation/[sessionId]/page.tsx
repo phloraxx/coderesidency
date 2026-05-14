@@ -18,17 +18,17 @@ interface Report {
 
 function ScoreBar({ label, value }: { label: string; value: number }) {
     return (
-        <div style={{ marginBottom: 16 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{label}</span>
-                <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{value}%</span>
+        <div style={{ marginBottom: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</span>
+                <span style={{ fontWeight: 800, fontSize: '1rem', fontFamily: 'Outfit, sans-serif' }}>{value}%</span>
             </div>
-            <div style={{ height: 6, background: 'var(--border)', borderRadius: 3, overflow: 'hidden' }}>
+            <div style={{ height: 8, background: 'var(--bg-secondary)', borderRadius: 0, overflow: 'hidden' }}>
                 <div style={{
-                    height: '100%', borderRadius: 3,
+                    height: '100%', borderRadius: 0,
                     width: `${value}%`,
-                    background: value >= 80 ? 'var(--accent-green)' : value >= 60 ? 'var(--accent-orange)' : 'var(--accent-red)',
-                    transition: 'width 1s ease',
+                    background: value >= 80 ? 'var(--google-green)' : value >= 60 ? 'var(--google-yellow)' : 'var(--google-red)',
+                    transition: 'width 1s cubic-bezier(0.25, 1, 0.5, 1)',
                 }} />
             </div>
         </div>
@@ -36,8 +36,8 @@ function ScoreBar({ label, value }: { label: string; value: number }) {
 }
 
 const GRADE_COLORS: Record<string, string> = {
-    'A+': '#10b981', 'A': '#10b981', 'B+': '#6366f1', 'B': '#6366f1',
-    'C+': '#f59e0b', 'C': '#f59e0b', 'D': '#ef4444', 'F': '#ef4444',
+    'A+': 'var(--google-green)', 'A': 'var(--google-green)', 'B+': 'var(--google-blue)', 'B': 'var(--google-blue)',
+    'C+': 'var(--google-yellow)', 'C': 'var(--google-yellow)', 'D': 'var(--google-red)', 'F': 'var(--google-red)',
 };
 
 export default function EvaluationPage() {
@@ -49,11 +49,9 @@ export default function EvaluationPage() {
 
     useEffect(() => {
         if (!sessionId) return;
-        // Try to get existing report, if not found generate it
         getEvaluation(sessionId)
             .then(setReport)
             .catch(() => {
-                // Generate new one
                 return generateEvaluation(sessionId).then(setReport);
             })
             .catch((e) => setError(e.message || 'Failed to load evaluation'))
@@ -62,50 +60,75 @@ export default function EvaluationPage() {
 
     if (loading) {
         return (
-            <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)', gap: 16 }}>
-                <div className="spinner" style={{ width: 40, height: 40, borderWidth: 3 }} />
-                <p style={{ color: 'var(--text-secondary)' }}>🤖 AI is generating your evaluation report...</p>
+            <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', padding: '24px' }}>
+                <div className="container animate-fade-in" style={{ maxWidth: 800, paddingTop: 64 }}>
+                     {/* Loading Header Skeleton */}
+                     <div style={{ textAlign: 'center', marginBottom: 64 }}>
+                        <div className="skeleton skeleton-box" style={{ width: 140, height: 140, borderRadius: '50%', margin: '0 auto 32px' }} />
+                        <div className="skeleton skeleton-text" style={{ height: 48, width: 300, margin: '0 auto 16px' }} />
+                        <div className="skeleton skeleton-text short" style={{ height: 20, margin: '0 auto' }} />
+                     </div>
+
+                     {/* Breakdown Skeletons */}
+                     <div className="ticket-card" style={{ marginBottom: 32 }}>
+                        <div className="skeleton skeleton-text" style={{ height: 24, width: 150, marginBottom: 32 }} />
+                        <div className="skeleton skeleton-text" style={{ height: 16, marginBottom: 24 }} />
+                        <div className="skeleton skeleton-text" style={{ height: 16, marginBottom: 24 }} />
+                        <div className="skeleton skeleton-text" style={{ height: 16 }} />
+                     </div>
+                </div>
             </div>
         );
     }
 
     if (error || !report) {
         return (
-            <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)', gap: 16 }}>
-                <div style={{ fontSize: '3rem' }}>⚠️</div>
-                <p style={{ color: 'var(--text-secondary)' }}>{error || 'Report not available'}</p>
-                <Link href="/dashboard" className="btn btn-ghost">Back to Dashboard</Link>
+            <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)', gap: 24 }}>
+                <div style={{ padding: '32px', border: '3px dashed var(--google-red)', background: '#fff' }}>
+                    <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--google-red)', textTransform: 'uppercase', marginBottom: 16 }}>Error loading report</div>
+                    <p style={{ color: 'var(--text-secondary)', fontWeight: 500, fontSize: '1.1rem', marginBottom: 32 }}>{error || 'Report not available'}</p>
+                    <Link href="/dashboard" className="btn btn-solid" style={{ borderRadius: 0, padding: '16px 24px', fontWeight: 800, textTransform: 'uppercase' }}>
+                        BACK TO DASHBOARD
+                    </Link>
+                </div>
             </div>
         );
     }
 
-    const gradeColor = GRADE_COLORS[report.letter_grade] || '#6366f1';
+    const gradeColor = GRADE_COLORS[report.letter_grade] || 'var(--text-primary)';
 
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', padding: '24px' }}>
-            <div className="container" style={{ maxWidth: 800, paddingTop: 48 }}>
+            <div className="container" style={{ maxWidth: 800, paddingTop: 64, paddingBottom: 64 }}>
+                <Link href="/dashboard" style={{ color: 'var(--text-primary)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    ← BACK TO DASHBOARD
+                </Link>
+
                 {/* Header */}
-                <div className="animate-fade-in" style={{ textAlign: 'center', marginBottom: 48 }}>
+                <div className="animate-fade-in" style={{ textAlign: 'center', marginBottom: 64, marginTop: 40 }}>
                     <div style={{
-                        width: 120, height: 120, borderRadius: '50%', margin: '0 auto 24px',
-                        background: `radial-gradient(circle, ${gradeColor}30, transparent)`,
-                        border: `3px solid ${gradeColor}`,
+                        width: 140, height: 140, borderRadius: '0', margin: '0 auto 32px',
+                        background: '#fff',
+                        border: `4px solid ${gradeColor}`,
+                        boxShadow: `8px 8px 0px ${gradeColor}`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        animation: 'pulse-glow 2s infinite',
                     }}>
-                        <span style={{ fontSize: '3rem', fontWeight: 900, color: gradeColor }}>
+                        <span style={{ fontSize: '4rem', fontWeight: 900, fontFamily: 'Outfit, sans-serif', color: gradeColor, lineHeight: 1 }}>
                             {report.letter_grade}
                         </span>
                     </div>
-                    <h1 style={{ fontSize: '2.5rem', marginBottom: 8 }}>Session Complete!</h1>
-                    <p style={{ color: 'var(--text-secondary)' }}>
-                        You scored <strong style={{ color: gradeColor }}>{report.overall_score}/100</strong> in this simulation.
+                    <h1 className="title-massive" style={{ fontSize: 'clamp(2.5rem, 6vw, 4rem)', marginBottom: 16 }}>SESSION COMPLETE</h1>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '1.2rem', fontWeight: 500 }}>
+                        Overall Score: <strong style={{ color: gradeColor, fontWeight: 900, fontSize: '1.5rem', fontFamily: 'Outfit, sans-serif' }}>{report.overall_score}/100</strong>
                     </p>
                 </div>
 
                 {/* Score Breakdown */}
-                <div className="card animate-fade-in" style={{ animationDelay: '0.1s', marginBottom: 24 }}>
-                    <h2 style={{ marginBottom: 24, fontSize: '1.2rem' }}>📊 Score Breakdown</h2>
+                <div className="ticket-card animate-fade-up delay-1" style={{ marginBottom: 32 }}>
+                    <h2 style={{ marginBottom: 32, fontSize: '1.2rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div style={{ width: 24, height: 24, background: 'var(--text-primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem' }}>01</div>
+                        Score Breakdown
+                    </h2>
                     <ScoreBar label="Overall Score" value={report.overall_score} />
                     <ScoreBar label="Communication" value={report.communication_score} />
                     <ScoreBar label="Technical Quality" value={report.technical_score} />
@@ -113,41 +136,44 @@ export default function EvaluationPage() {
                 </div>
 
                 {/* Strengths + Improvements */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
-                    <div className="card animate-fade-in" style={{ animationDelay: '0.2s', borderTop: '2px solid var(--accent-green)' }}>
-                        <h3 style={{ marginBottom: 12, fontSize: '1rem', color: 'var(--accent-green)' }}>✅ Strengths</h3>
-                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.7 }}>
-                            {report.strengths || 'Good work overall!'}
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 32, marginBottom: 32 }}>
+                    <div className="ticket-card animate-fade-up delay-2" style={{ borderTop: '6px solid var(--google-green)' }}>
+                        <h3 style={{ marginBottom: 20, fontSize: '1.1rem', fontWeight: 800, color: 'var(--google-green)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Key Strengths</h3>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.7, fontWeight: 500 }}>
+                            {report.strengths || 'Performance met baseline expectations.'}
                         </p>
                     </div>
-                    <div className="card animate-fade-in" style={{ animationDelay: '0.3s', borderTop: '2px solid var(--accent-orange)' }}>
-                        <h3 style={{ marginBottom: 12, fontSize: '1rem', color: 'var(--accent-orange)' }}>💡 Improve On</h3>
-                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.7 }}>
-                            {report.areas_for_improvement || 'Keep practicing!'}
+                    <div className="ticket-card animate-fade-up delay-3" style={{ borderTop: '6px solid var(--google-yellow)' }}>
+                        <h3 style={{ marginBottom: 20, fontSize: '1.1rem', fontWeight: 800, color: 'var(--google-yellow)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Areas for Growth</h3>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.7, fontWeight: 500 }}>
+                            {report.areas_for_improvement || 'Continue refining core mechanics.'}
                         </p>
                     </div>
                 </div>
 
                 {/* Detailed Breakdown */}
                 {report.detailed_breakdown && Object.keys(report.detailed_breakdown).length > 0 && (
-                    <div className="card animate-fade-in" style={{ animationDelay: '0.4s', marginBottom: 24 }}>
-                        <h2 style={{ marginBottom: 20, fontSize: '1.2rem' }}>🔍 Detailed Breakdown</h2>
-                        {Object.entries(report.detailed_breakdown).map(([category, items]) => (
-                            <div key={category} style={{ marginBottom: 24 }}>
-                                <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--accent-blue)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>
+                    <div className="ticket-card animate-fade-up delay-4" style={{ marginBottom: 48 }}>
+                        <h2 style={{ marginBottom: 32, fontSize: '1.2rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: 12 }}>
+                            <div style={{ width: 24, height: 24, background: 'var(--text-primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem' }}>02</div>
+                            Detailed Feedback
+                        </h2>
+                        {Object.entries(report.detailed_breakdown).map(([category, items], idx) => (
+                            <div key={category} style={{ marginBottom: idx === Object.entries(report.detailed_breakdown!).length - 1 ? 0 : 40 }}>
+                                <h3 style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--google-blue)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 20, borderBottom: '2px dashed var(--border-hover)', paddingBottom: 12 }}>
                                     {category}
                                 </h3>
                                 {Object.entries(items).map(([key, item]) => (
-                                    <div key={key} style={{ marginBottom: 12, paddingLeft: 12, borderLeft: '2px solid var(--border)' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                                            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'capitalize' }}>
+                                    <div key={key} style={{ marginBottom: 20, paddingLeft: 16, borderLeft: '4px solid var(--bg-secondary)' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                                            <span style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: 700, textTransform: 'capitalize' }}>
                                                 {key.replace(/_/g, ' ')}
                                             </span>
-                                            <span style={{ fontWeight: 700, color: item.score >= 70 ? 'var(--accent-green)' : 'var(--accent-orange)' }}>
+                                            <span style={{ fontWeight: 900, fontFamily: 'Outfit, sans-serif', color: item.score >= 70 ? 'var(--google-green)' : 'var(--google-yellow)' }}>
                                                 {item.score}/100
                                             </span>
                                         </div>
-                                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>{item.feedback}</p>
+                                        <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: 1.6, fontWeight: 500 }}>{item.feedback}</p>
                                     </div>
                                 ))}
                             </div>
@@ -156,12 +182,12 @@ export default function EvaluationPage() {
                 )}
 
                 {/* Actions */}
-                <div className="animate-fade-in" style={{ animationDelay: '0.5s', display: 'flex', gap: 12, justifyContent: 'center' }}>
-                    <Link href="/modules/difficult-client" className="btn btn-ghost">
-                        Try Another Scenario
+                <div className="animate-fade-in" style={{ animationDelay: '0.5s', display: 'flex', gap: 16, justifyContent: 'center' }}>
+                    <Link href="/modules/difficult-client" className="btn btn-outline" style={{ borderRadius: 0, padding: '16px 32px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', border: '2px dashed var(--text-primary)', color: 'var(--text-primary)' }}>
+                        RETRY SCENARIO
                     </Link>
-                    <Link href="/dashboard" className="btn btn-solid">
-                        Back to Dashboard →
+                    <Link href="/dashboard" className="btn btn-solid" style={{ borderRadius: 0, padding: '16px 32px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        BACK TO DASHBOARD
                     </Link>
                 </div>
             </div>

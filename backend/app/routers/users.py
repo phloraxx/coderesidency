@@ -32,8 +32,8 @@ async def get_my_profile(user_id: str = Depends(get_current_user_id)):
                 table_id=settings.appwrite_collection_users,
                 row_id=user_id,
                 data={
-                    "name": auth_user.get("name", "Student"),
-                    "email": auth_user.get("email", ""),
+                    "name": auth_user.name if hasattr(auth_user, 'name') else "Student",
+                    "email": auth_user.email if hasattr(auth_user, 'email') else "",
                     "auth_provider": "oauth",
                     "global_score": 0,
                     "role": "student",

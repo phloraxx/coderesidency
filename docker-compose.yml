@@ -31,8 +31,9 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
-      - /var/run/docker.sock:/var/run/docker.sock  # Docker-in-Docker for sandbox
+      - ${DOCKER_SOCK_BIND:-/var/run/docker.sock}:/var/run/docker.sock
     environment:
+      - DOCKER_HOST=${DOCKER_HOST:-unix:///var/run/docker.sock}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - APPWRITE_ENDPOINT=${APPWRITE_ENDPOINT}
       - APPWRITE_PROJECT_ID=${APPWRITE_PROJECT_ID}

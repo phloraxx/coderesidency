@@ -26,7 +26,7 @@ def get_current_user_id(authorization: str = Header(...)) -> str:
 
         account = Account(client)
         user = account.get()
-        return user["$id"]
+        return user.id
     except Exception as e:
         logger.error(f"Auth validation error: {e}")
         raise HTTPException(status_code=401, detail="Invalid or expired token")

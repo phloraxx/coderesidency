@@ -25,6 +25,21 @@ def get_evaluator() -> EvaluatorAgent:
     return _evaluator
 
 
+def _bounded_string(value, max_len: int) -> str:
+    """Coerce any value to a DB-safe string and enforce a max length."""
+    if value is None:
+        text = ""
+    elif isinstance(value, str):
+        text = value
+    elif isinstance(value, (list, tuple)):
+        text = "\n".join(str(v) for v in value)
+    elif isinstance(value, dict):
+        text = json.dumps(value, ensure_ascii=False)
+    else:
+        text = str(value)
+    return text[:max_len]
+
+
 @router.post("/{session_id}/generate")
 async def generate_evaluation(
     session_id: str,
@@ -80,6 +95,8 @@ async def generate_evaluation(
         # Save report to DB
         report_id = str(uuid.uuid4())
         now = datetime.now(timezone.utc)
+        feedback_text = _bounded_string(report_data.get("strengths", ""), 5000)
+        breakdown_text = _bounded_string(report_data.get("detailed_breakdown", {}), 5000)
         db.create_row(
             database_id=settings.appwrite_db_id,
             table_id=settings.appwrite_collection_eval_reports,
@@ -88,8 +105,8 @@ async def generate_evaluation(
                 "session_id": session_id,
                 "user_id": user_id,
                 "total_score": final_score,
-                "feedback": report_data.get("strengths", ""),
-                "breakdown": json.dumps(report_data.get("detailed_breakdown", {})),
+                "feedback": feedback_text,
+                "breakdown": breakdown_text,
                 "generated_at": now.isoformat(),
             },
         )

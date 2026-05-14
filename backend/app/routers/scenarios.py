@@ -18,6 +18,24 @@ from typing import Optional
 
 router = APIRouter(prefix="/api", tags=["scenarios"])
 logger = logging.getLogger(__name__)
+_code_submission_columns: set[str] | None = None
+
+
+def _filter_code_submission_data(db, data: dict) -> dict:
+    global _code_submission_columns
+    if _code_submission_columns is None:
+        try:
+            cols = db.list_columns(
+                database_id=settings.appwrite_db_id,
+                table_id=settings.appwrite_collection_code_submissions,
+            )
+            _code_submission_columns = {
+                c.get("key") for c in cols.get("columns", []) if c.get("key")
+            }
+        except Exception as e:
+            logger.warning(f"Failed to inspect code_submissions columns: {e}")
+            return data
+    return {k: v for k, v in data.items() if k in _code_submission_columns}
 
 
 class SessionStartBody(BaseModel):
@@ -81,7 +99,7 @@ async def start_scenario(
             data={
                 "user_id": user_id,
                 "scenario_id": scenario_id,
-                "module_id": scenario.get("module_id", ""),
+                "module_id": scenario["module_id"] if "module_id" in scenario else "",
                 "status": "active",
                 "final_score": 0,
                 "started_at": now.isoformat(),
@@ -112,11 +130,11 @@ async def start_scenario(
             "session_id": session_id,
             "scenario": {
                 "scenario_id": scenario_id,
-                "title": scenario.get("title"),
-                "description": scenario.get("description"),
-                "module_type": scenario.get("module_type", "client"),
-                "time_limit_seconds": scenario.get("time_limit_seconds"),
-                "max_score": scenario.get("max_score", 100),
+                "title": scenario["title"] if "title" in scenario else None,
+                "description": scenario["description"] if "description" in scenario else None,
+                "module_type": scenario["module_type"] if "module_type" in scenario else "client",
+                "time_limit_seconds": scenario["time_limit_seconds"] if "time_limit_seconds" in scenario else None,
+                "max_score": scenario["max_score"] if "max_score" in scenario else 100,
             },
             "initial_state": {
                 "client_name": persona.get("name", "Client"),
@@ -148,20 +166,21 @@ async def execute_code(
 
     # Log submission to DB (non-fatal if it fails)
     try:
+        submission_data = {
+            "session_id": body.session_id,
+            "user_id": user_id,
+            "language": body.language,
+            "code": body.code[:50000],
+            "exit_code": result["exit_code"],
+            "stdout": (result.get("stdout") or "")[:10000],
+            "stderr": (result.get("stderr") or "")[:10000],
+            "submitted_at": datetime.now(timezone.utc).isoformat(),
+        }
         db.create_row(
             database_id=settings.appwrite_db_id,
             table_id=settings.appwrite_collection_code_submissions,
             row_id=str(uuid.uuid4()),
-            data={
-                "session_id": body.session_id,
-                "user_id": user_id,
-                "language": body.language,
-                "code": body.code[:50000],
-                "exit_code": result["exit_code"],
-                "stdout": (result.get("stdout") or "")[:10000],
-                "stderr": (result.get("stderr") or "")[:10000],
-                "submitted_at": datetime.now(timezone.utc).isoformat(),
-            },
+            data=_filter_code_submission_data(db, submission_data),
         )
     except Exception as e:
         logger.warning(f"Failed to log code submission: {e}")

@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 import logging
 
 from app.config import settings
-from app.routers import auth, users, modules, scenarios, chat, eval
+from app.routers import auth, users, modules, scenarios, chat, eval, coding_challenge
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -47,6 +47,7 @@ app.include_router(modules.router)
 app.include_router(scenarios.router)
 app.include_router(chat.router)
 app.include_router(eval.router)
+app.include_router(coding_challenge.router)
 
 
 @app.get("/")
