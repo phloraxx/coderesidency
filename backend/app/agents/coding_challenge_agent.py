@@ -20,7 +20,7 @@ class ChallengeGeneratorAgent:
 
     def __init__(self):
         self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash-lite-preview-09-2025",
+            model="gemini-2.5-flash-lite",
             google_api_key=settings.gemini_api_key,
             temperature=0.3,
         )

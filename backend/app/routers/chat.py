@@ -279,7 +279,7 @@ async def websocket_chat(websocket: WebSocket):
         client.set_jwt(token)
         account_svc = Account(client)
         appwrite_user = account_svc.get()
-        user_id = appwrite_user["$id"]
+        user_id = appwrite_user.get("$id") if isinstance(appwrite_user, dict) else appwrite_user.id
 
         # Track connection
         if session_id not in active_connections:

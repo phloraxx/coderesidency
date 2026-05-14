@@ -19,7 +19,7 @@ async def list_modules(user_id: str = Depends(get_current_user_id)):
         modules = db.list_rows(
             database_id=settings.appwrite_db_id,
             table_id=settings.appwrite_collection_modules,
-            queries=[Query.equal("is_active", True)],
+            queries=[Query.equal("is_active", True), Query.order_asc("$id")],
         )
 
         # Enrich each module with user's best score

@@ -1,0 +1,12 @@
+{
+	"mcpServers": {
+		"human-in-the-loop": {
+			"command": "hitl-mcp-server",
+			"args": [],
+			"alwaysAllow": [
+				"get_user_input",
+				"show_info_message"
+			]
+		}
+	}
+}

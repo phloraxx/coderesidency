@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { sendChatMessage, getChatHistory, executeCode, generateEvaluation, startScenario, getScenarios } from '@/lib/api';
 import Link from 'next/link';
+import Navbar from '@/components/Navbar';
 
 // Dynamic import — Monaco Editor requires browser
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false });
@@ -133,41 +134,107 @@ export default function DifficultClientPage() {
     // ── Scenario Selector ─────────────────────────────
     if (!sessionId) {
         return (
-            <div style={{ minHeight: '100vh', background: 'var(--bg-secondary)', padding: '24px' }}>
-                <div className="container" style={{ paddingTop: 48, maxWidth: 1000 }}>
-                    <Link href="/dashboard" style={{ color: 'var(--google-blue)', textDecoration: 'none', fontSize: '0.95rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <span>←</span> Back to Dashboard
-                    </Link>
-                    <div style={{ marginTop: 32, marginBottom: 48 }}>
-                        <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 48, height: 48, borderRadius: '50%', background: 'color-mix(in srgb, var(--google-blue) 10%, transparent)', color: 'var(--google-blue)', fontSize: '1.5rem', marginBottom: 16 }}>💬</div>
-                        <h1 style={{ marginBottom: 12, fontSize: '2.5rem', fontWeight: 700, letterSpacing: '-0.02em' }}>The Difficult Client</h1>
-                        <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', maxWidth: 600 }}>
-                            Choose a scenario and practice extracting real requirements from a challenging client.
+            <div className="page-container">
+                <Navbar showBack backHref="/dashboard" backLabel="Dashboard" />
+
+                <main className="page-content">
+                    {/* Module Hero */}
+                    <div className="module-hero animate-fade-in" style={{ '--hero-color': 'var(--google-blue)' } as React.CSSProperties}>
+                        <div className="module-hero-icon" style={{ background: 'linear-gradient(135deg, var(--google-blue), #4285f4)' }}>
+                            💬
+                        </div>
+                        <h1 className="module-hero-title">The Difficult Client</h1>
+                        <p className="module-hero-description">
+                            Choose a scenario and practice extracting real requirements from a challenging client. 
+                            Master the art of asking the right questions to uncover hidden constraints.
                         </p>
+                        <div className="module-hero-meta">
+                            <span className="module-hero-tag">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <polyline points="12,6 12,12 16,14" />
+                                </svg>
+                                15-30 min per scenario
+                            </span>
+                            <span className="module-hero-tag">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                </svg>
+                                AI-powered conversations
+                            </span>
+                        </div>
                     </div>
+
+                    {/* Scenarios */}
+                    <div style={{ marginBottom: 'var(--space-md)' }}>
+                        <h2 className="section-title">Available Scenarios</h2>
+                    </div>
+
                     {loadingScenarios ? (
-                        <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}><div className="spinner" /></div>
+                        <div className="loading-center">
+                            <div className="spinner" />
+                        </div>
                     ) : (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24 }}>
-                            {scenarios.map((s) => (
-                                <div key={s.$id} className="card" style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column' }} onClick={() => handleStartScenario(s.$id)}>
-                                    <h3 style={{ marginBottom: 12, fontSize: '1.25rem', fontWeight: 500 }}>{s.title}</h3>
-                                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginBottom: 24, flexGrow: 1, lineHeight: 1.5 }}>{s.description}</p>
-                                    <div style={{ borderTop: '1px solid var(--border)', paddingTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Estimated: 15-30m</span>
-                                        <span style={{ color: 'var(--google-blue)', fontWeight: 500, fontSize: '0.9rem' }}>Start Scenario →</span>
+                        <div className="scenario-grid stagger-children">
+                            {scenarios.map((s, i) => (
+                                <div 
+                                    key={s.$id} 
+                                    className="scenario-card animate-fade-up"
+                                    style={{ animationDelay: `${i * 0.05}s` }}
+                                    onClick={() => handleStartScenario(s.$id)}
+                                >
+                                    <div className="scenario-card-header">
+                                        <h3 className="scenario-card-title">{s.title}</h3>
+                                    </div>
+                                    <p className="scenario-card-description">{s.description}</p>
+                                    <div className="scenario-card-footer">
+                                        <span className="scenario-card-time">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 4, verticalAlign: 'middle' }}>
+                                                <circle cx="12" cy="12" r="10" />
+                                                <polyline points="12,6 12,12 16,14" />
+                                            </svg>
+                                            15-30 min
+                                        </span>
+                                        <span className="scenario-card-action">
+                                            Start Scenario
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <path d="M5 12h14M12 5l7 7-7 7" />
+                                            </svg>
+                                        </span>
                                     </div>
                                 </div>
                             ))}
+
                             {scenarios.length === 0 && (
-                                <div className="card" style={{ gridColumn: '1/-1', textAlign: 'center', padding: 48 }}>
-                                    <div style={{ fontSize: '2rem', marginBottom: 16 }}>⚠️</div>
-                                    <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>No scenarios found. Run the setup script first.</p>
+                                <div className="empty-state" style={{ gridColumn: '1 / -1' }}>
+                                    <div className="empty-state-icon">💬</div>
+                                    <div className="empty-state-title">No Scenarios Found</div>
+                                    <p className="empty-state-description">
+                                        Run the setup script to load client scenarios.
+                                    </p>
                                 </div>
                             )}
                         </div>
                     )}
-                </div>
+                </main>
+
+                {/* Footer */}
+                <footer className="page-footer">
+                    <div className="page-footer-inner">
+                        <div className="footer-brand">
+                            <div className="footer-brand-squares">
+                                <span style={{ background: 'var(--google-blue)' }} />
+                                <span style={{ background: 'var(--google-red)' }} />
+                                <span style={{ background: 'var(--google-yellow)' }} />
+                                <span style={{ background: 'var(--google-green)' }} />
+                            </div>
+                            <span>CodeResidency</span>
+                        </div>
+                        <div className="footer-credit">
+                            MuLearn SCET • Built with Next.js
+                        </div>
+                    </div>
+                </footer>
             </div>
         );
     }

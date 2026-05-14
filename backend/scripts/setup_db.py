@@ -278,7 +278,7 @@ def setup_collections(db: Databases):
 
 
 def seed_modules(db: Databases):
-    """Seed the 4 core modules."""
+    """Seed the 5 core modules."""
     print("\n🌱 Seeding modules...")
     modules = [
         {
@@ -299,6 +299,38 @@ def seed_modules(db: Databases):
         },
         {
             "$id": "mod-002",
+            "title": "The Code Crucible",
+            "slug": "code-crucible",
+            "description": "Implement solutions to real-world coding challenges. Write clean, correct code that passes all test cases.",
+            "difficulty_level": 3,
+            "estimated_duration_mins": 30,
+            "learning_objectives": json.dumps([
+                "Algorithm design",
+                "Code optimization",
+                "Edge case handling",
+                "Unit testing",
+            ]),
+            "is_active": True,
+            "icon": "</>",
+        },
+        {
+            "$id": "mod-003",
+            "title": "The Gatekeeper",
+            "slug": "gatekeeper",
+            "description": "A teammate secretly introduced a bug. Use git log, git blame, and git bisect to find and undo it — without breaking the repository.",
+            "difficulty_level": 5,
+            "estimated_duration_mins": 60,
+            "learning_objectives": json.dumps([
+                "Git forensics",
+                "Code review",
+                "Safe rollback strategies",
+                "Merge conflict resolution",
+            ]),
+            "is_active": True,
+            "icon": "🕵️",
+        },
+        {
+             "$id": "mod-004",
             "title": "The War Room",
             "slug": "war-room",
             "description": "Handle production server outages under pressure. Diagnose and fix faults in a real Linux environment with a ticking clock.",
@@ -314,9 +346,9 @@ def seed_modules(db: Databases):
             "icon": "🔥",
         },
         {
-            "$id": "mod-003",
-            "title": "The Gatekeeper",
-            "slug": "gatekeeper",
+            "$id": "mod-005",
+            "title": "The Imposter",
+            "slug": "imposter",
             "description": "Ace your technical and behavioral interviews. AI parsing your resume for targeted questions.",
             "difficulty_level": 3,
             "estimated_duration_mins": 40,
@@ -328,22 +360,6 @@ def seed_modules(db: Databases):
             ]),
             "is_active": True,
             "icon": "🎯",
-        },
-        {
-            "$id": "mod-004",
-            "title": "The Imposter",
-            "slug": "imposter",
-            "description": "Find the bug an AI teammate secretly introduced. Master git forensics: log, blame, bisect, and safe rollback.",
-            "difficulty_level": 5,
-            "estimated_duration_mins": 60,
-            "learning_objectives": json.dumps([
-                "Git forensics",
-                "Code review",
-                "Safe rollback strategies",
-                "Merge conflict resolution",
-            ]),
-            "is_active": True,
-            "icon": "🕵️",
         },
     ]
 
@@ -359,7 +375,17 @@ def seed_modules(db: Databases):
             print(f"  ✅ {m['title']}")
         except Exception as e:
             if "already exists" in str(e).lower() or "409" in str(e):
-                print(f"  ℹ️  {m['title']} (already seeded)")
+                print(f"  ℹ️  {m['title']} (updating existing...)")
+                try:
+                    db.update_document(
+                        database_id=settings.appwrite_db_id,
+                        collection_id=settings.appwrite_collection_modules,
+                        document_id=doc_id,
+                        data=m,
+                    )
+                    print(f"  🔄 Updated {m['title']}")
+                except Exception as update_err:
+                     print(f"  ❌ Failed to update {m['title']}: {update_err}")
             else:
                 print(f"  ❌ {m['title']}: {e}")
 
